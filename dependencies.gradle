@@ -1,0 +1,8 @@
+ext {
+    // Library
+    glideVersion = '4.1.1'
+    gsonVersion = '2.7'
+    okHttpVersion = '3.8.1'
+    retrofitVersion = '2.3.0'
+    supportLibVersion = '28.0.0'
+}
