@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Log.d("MainActivity", "[ksg] launchMainActivity()")
 
-        btnActivityMainSearch.requestFocus()
+        btnActivityMainSearch.requestFocus() // [syk] STB 환경에서 버튼 선택이 어려워 추가
         btnActivityMainSearch.setOnClickListener {
             startActivity(Intent(this@MainActivity, SearchActivity::class.java))
         }
