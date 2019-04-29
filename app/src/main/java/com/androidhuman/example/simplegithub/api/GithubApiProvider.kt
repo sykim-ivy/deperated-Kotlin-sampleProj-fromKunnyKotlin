@@ -2,7 +2,10 @@ package com.androidhuman.example.simplegithub.api
 
 import android.content.Context
 import com.androidhuman.example.simplegithub.data.AuthTokenProvider
+<<<<<<< HEAD
 import com.google.gson.Gson
+=======
+>>>>>>> origin/master
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -12,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.IllegalStateException
 
 /**
- * Retrofit 객체 생성
+ * [Github OAuth API] Retrofit 객체 생성
  */
 fun provideAuthApi(): AuthApi {
     return Retrofit.Builder()
@@ -30,6 +33,38 @@ fun provideGithubApi(context: Context) : GithubApi{
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(GithubApi::class.java)
+}
+
+/**
+ * [Github Search API] Retrofit 객체 생성
+ */
+fun provideGithubApi(context: Context): GithubApi {
+    return Retrofit.Builder()
+        .baseUrl("https://api.github.com/")
+        .client(provideOkHttpClient(provideLoggingInterceptor(),
+            provideAuthInterceptor(provideAuthTokenProvider(context))))
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(GithubApi::class.java) // << API 통신을 위해 정의한 인터페이스를 Retrofit에 초기화 //TODO : .class 어떻게 바꿔야하는지 모르겠음
+}
+
+/**
+ * [Github Search API] access_token값으로 AuthInterceptor 객체 생성
+ */
+fun provideAuthInterceptor(provider: AuthTokenProvider): AuthInterceptor? {
+    val token = provider.getToken()
+    if(null == token){
+        throw IllegalStateException("authToken cannot be null")
+    }
+    return AuthInterceptor(token)
+}
+
+
+/**
+ * [Github Search API] AuthTokenProvider 객체 리턴
+ */
+fun provideAuthTokenProvider(context: Context): AuthTokenProvider {
+    return AuthTokenProvider(context.applicationContext)
 }
 
 /**

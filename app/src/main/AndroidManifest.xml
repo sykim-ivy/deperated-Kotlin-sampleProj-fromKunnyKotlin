@@ -12,14 +12,42 @@
         <activity android:name=".SignInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- TODO: Q. 여기▽ 있는 애들 모르겠음 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                        android:host="authorize"
+                        android:scheme="simplegithub" />
             </intent-filter>
         </activity>
         <activity android:name=".ui.main.MainActivity"
                 android:label="@string/app_name"/>
 
+<<<<<<< HEAD
         <!-- TODO TODO TODO SearchActivity&RepositoryActivity -->
+=======
+        <activity android:name=".ui.search.SearchActivity"
+                  android:label="@string/search"
+                  android:parentActivityName=".ui.main.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.main.MainActivity" />
+        </activity>
+
+        <activity android:name=".ui.RepositoryActivity"
+                  android:label="@string/view_repository"
+                  android:parentActivityName=".ui.main.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".ui.main.MainActivity" />
+        </activity>
+>>>>>>> origin/master
 
 
     </application>
