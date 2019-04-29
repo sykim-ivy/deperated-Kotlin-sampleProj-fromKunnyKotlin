@@ -22,10 +22,10 @@ import java.lang.IllegalStateException
 
 class SignInActivity : AppCompatActivity() {
 
-    var api: AuthApi? = null
-    var authTokenProvider: AuthTokenProvider? = null
+    private var api: AuthApi? = null
+    private var authTokenProvider: AuthTokenProvider? = null
 
-    var accessTokenCall: Call<GithubAccessToken>? = null // API응답형식을 GithubAccessToken로 받아오는 객체 Call
+    private var accessTokenCall: Call<GithubAccessToken>? = null // API응답형식을 GithubAccessToken로 받아오는 객체 Call
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,14 +34,17 @@ class SignInActivity : AppCompatActivity() {
         Log.d("SignInActivity", "[ksg] onCreate()")
 
         btnActivitySignInStart.setOnClickListener{
-            var authUri = Uri.Builder().scheme("https").authority("github.com")
+            Log.d("SignInActivity", "[ksg] OnClick()")
+            val authUri = Uri.Builder().scheme("https").authority("github.com")
                 .appendPath("login")
                 .appendPath("oauth")
                 .appendPath("authorize")
                 .appendQueryParameter("client_id", BuildConfig.GITHUB_CLIENT_ID)
                 .build()
 
-            var intent = CustomTabsIntent.Builder().build()
+            Log.d("SignInActivity", "[ksg] uri = ${authUri.toString()}")
+
+            val intent = CustomTabsIntent.Builder().build()
             intent.launchUrl(this@SignInActivity, authUri)
         }
 
@@ -63,7 +66,7 @@ class SignInActivity : AppCompatActivity() {
 
         val uri = intent?.data
         if(null === uri) {
-            throw IllegalArgumentException("No data exists");
+            throw IllegalArgumentException("No data exists")
         }
 
         val code = uri.getQueryParameter("code")
@@ -75,7 +78,7 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun getAccessToken(code: String) {
-        Log.d("SignInActivity", "[ksg] getAccessToken() : code = " + code)
+        Log.d("SignInActivity", "[ksg] getAccessToken() : code = $code")
         showProgress()
 
         accessTokenCall = api?.getAccessToken(

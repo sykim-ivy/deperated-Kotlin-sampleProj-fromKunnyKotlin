@@ -5,7 +5,7 @@ import android.preference.PreferenceManager
 
 class AuthTokenProvider(val context: Context) {
     companion object {
-        val KEY_AUTH_TOKEN = "auth_token"
+        const val KEY_AUTH_TOKEN = "auth_token"
     }
 
     fun updateToken(token: String) {

@@ -16,16 +16,16 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.RepositoryHolder>() {
 
     var items: MutableList<GithubRepo> = mutableListOf()
 
-    val placeholder: ColorDrawable? = ColorDrawable(Color.GRAY)
+    private val placeholder: ColorDrawable? = ColorDrawable(Color.GRAY)
 
-    var listener: ItemClickListener? = null
+    private var listener: ItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoryHolder {
         return RepositoryHolder(parent)
     }
 
     override fun onBindViewHolder(holder: RepositoryHolder, position: Int) {
-        val repo: GithubRepo = items.get(position)
+        val repo: GithubRepo = items[position]
 
         with(holder.itemView) {
             GlideApp.with(context)

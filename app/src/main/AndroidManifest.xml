@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.androidhuman.example.simplegithub">
+<manifest
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+          package="com.androidhuman.example.simplegithub"
+        tools:ignore="UnusedAttribute">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignInActivity">
+        <activity android:name=".ui.main.MainActivity"
+                  android:label="@string/app_name"/>
+
+        <activity android:name=".SignInActivity"
+                android:label="@string/app_name"
+                android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- TODO: Q. 여기▽ 있는 애들 모르겠음 -->
+            <!-- TODO: 안드로이드 자체 브라우저로 특정 앱을 실행 하는 것이 가능하다. 이것은 안드로이드 OS가 가진 intent의 특징으로 가능 한것 같다.  -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -26,12 +36,8 @@
                         android:scheme="simplegithub" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.main.MainActivity"
-                android:label="@string/app_name"/>
 
-<<<<<<< HEAD
         <!-- TODO TODO TODO SearchActivity&RepositoryActivity -->
-=======
         <activity android:name=".ui.search.SearchActivity"
                   android:label="@string/search"
                   android:parentActivityName=".ui.main.MainActivity">
@@ -40,16 +46,13 @@
                 android:value=".ui.main.MainActivity" />
         </activity>
 
-        <activity android:name=".ui.RepositoryActivity"
+        <activity android:name=".ui.repo.RepositoryActivity"
                   android:label="@string/view_repository"
                   android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".ui.main.MainActivity" />
         </activity>
->>>>>>> origin/master
-
-
     </application>
 
 </manifest>

@@ -8,18 +8,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface GithubApi {
-<<<<<<< HEAD
-
-    @GET("search/repositories")
-    fun searchRepository(@Query("q") query: String?) : Call<RepoSearchResponse>
-
-    @GET("repos/{owner}/{name}")
-    fun getRepository(@Path("owner") ownerLogin: String, @Path("name") repoName: String) : Call<GithubRepo>
-=======
-
     @GET("search/repositories")
     fun searchRepository(@Query("q") query: String) : Call<RepoSearchResponse>
->>>>>>> origin/master
 
     @GET("repos/{owner}/{name}")
     fun getRepository(@Path("owner") ownerLogin: String, @Path("name") repoName: String) : Call<GithubRepo>
