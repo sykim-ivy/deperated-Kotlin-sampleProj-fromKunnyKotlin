@@ -1,4 +1,4 @@
-package com.androidhuman.example.simplegithub
+package com.androidhuman.example.simplegithub.ui.signin
 
 import android.content.Intent
 import android.net.Uri
@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
+import com.androidhuman.example.simplegithub.BuildConfig
+import com.androidhuman.example.simplegithub.R
 import com.androidhuman.example.simplegithub.api.AuthApi
 import com.androidhuman.example.simplegithub.api.model.GithubAccessToken
 import com.androidhuman.example.simplegithub.api.provideAuthApi
@@ -82,7 +84,8 @@ class SignInActivity : AppCompatActivity() {
         showProgress()
 
         accessTokenCall = api?.getAccessToken(
-            BuildConfig.GITHUB_CLIENT_ID, BuildConfig.GITHUB_CLIENT_SECRET, code)
+            BuildConfig.GITHUB_CLIENT_ID,
+            BuildConfig.GITHUB_CLIENT_SECRET, code)
 
         accessTokenCall?.enqueue(object : Callback<GithubAccessToken> { // << TODO: object로 선언하면 클래스 선언과 동시에 객체가 생성됩니다. << 이거 이렇게 쓰기도 해??
 
