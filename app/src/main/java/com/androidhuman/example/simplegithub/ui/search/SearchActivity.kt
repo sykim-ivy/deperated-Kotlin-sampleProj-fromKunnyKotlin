@@ -107,7 +107,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
 
                 val searchResult = response.body()
                 if(response.isSuccessful && null != searchResult) {
-                    adapter?.items = searchResult.items.toMutableList()
+                    adapter?.setItems(searchResult.items.toMutableList())
                     adapter?.notifyDataSetChanged()
 
                     if(searchResult.totalCount == 0) {
