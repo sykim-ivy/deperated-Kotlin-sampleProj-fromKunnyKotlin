@@ -6,8 +6,8 @@ import android.util.Log
 import android.view.View
 import com.androidhuman.example.simplegithub.R
 import com.androidhuman.example.simplegithub.api.GithubApi
+import com.androidhuman.example.simplegithub.api.GithubApiProvider
 import com.androidhuman.example.simplegithub.api.model.GithubRepo
-import com.androidhuman.example.simplegithub.api.provideGithubApi
 import com.androidhuman.example.simplegithub.ui.GlideApp
 import kotlinx.android.synthetic.main.activity_repository.*
 import retrofit2.Call
@@ -37,7 +37,7 @@ class RepositoryActivity : AppCompatActivity() {
 
         Log.d("RepositoryActivity", "[ksg] onCreate()")
 
-        api = provideGithubApi(this@RepositoryActivity)
+        api = GithubApiProvider.provideGithubApi(this@RepositoryActivity)
 
         //TODO : elvis operator 사용 확인!
         val login = intent.getStringExtra(KEY_USER_LOGIN) ?: throw IllegalArgumentException("No login info exists in extras")

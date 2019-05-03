@@ -12,8 +12,8 @@ import android.widget.Toast
 import com.androidhuman.example.simplegithub.BuildConfig
 import com.androidhuman.example.simplegithub.R
 import com.androidhuman.example.simplegithub.api.AuthApi
+import com.androidhuman.example.simplegithub.api.GithubApiProvider
 import com.androidhuman.example.simplegithub.api.model.GithubAccessToken
-import com.androidhuman.example.simplegithub.api.provideAuthApi
 import com.androidhuman.example.simplegithub.data.AuthTokenProvider
 import com.androidhuman.example.simplegithub.ui.main.MainActivity
 import kotlinx.android.synthetic.main.activity_sign_in.*
@@ -50,7 +50,7 @@ class SignInActivity : AppCompatActivity() {
             intent.launchUrl(this@SignInActivity, authUri)
         }
 
-        api = provideAuthApi() // static method called // api는 API가 등록된 Retrofit 서비스 객체
+        api = GithubApiProvider.provideAuthApi() // static method called // api는 API가 등록된 Retrofit 서비스 객체
 
         authTokenProvider = AuthTokenProvider(this) // SP에 auth_token값 저장 관리 객체
         if(null != authTokenProvider!!.getToken()) { // [syk] 위에서 객체 생성하니까 '!!'키워드로 non-null값 보장
