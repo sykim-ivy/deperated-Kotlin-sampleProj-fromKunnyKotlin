@@ -8,13 +8,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.androidhuman.example.simplegithub.R
 import com.androidhuman.example.simplegithub.api.model.GithubRepo
-import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.module.AppGlideModule
+import com.androidhuman.example.simplegithub.ui.GlideApp
+
 import kotlinx.android.synthetic.main.item_repository.view.*
 
 class SearchAdapter : RecyclerView.Adapter<SearchAdapter.RepositoryHolder>() {
 
-    var items: MutableList<GithubRepo> = mutableListOf()
+    private var items: MutableList<GithubRepo> = mutableListOf()
 
     private val placeholder: ColorDrawable? = ColorDrawable(Color.GRAY)
 
@@ -57,6 +57,10 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.RepositoryHolder>() {
         this.listener = listener
     }
 
+    fun setItems(items: List<GithubRepo>) {
+        this.items = items.toMutableList()
+    }
+
     fun clearItems() {
         items.clear() // (immutable)List는 clear함수 없음;
     }
@@ -68,6 +72,3 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.RepositoryHolder>() {
         fun onItemClick(repository: GithubRepo)
     }
 }
-
-@GlideModule
-class AppGlideModule : AppGlideModule()

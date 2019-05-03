@@ -1,7 +1,6 @@
 package com.androidhuman.example.simplegithub.ui.repo
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -9,7 +8,7 @@ import com.androidhuman.example.simplegithub.R
 import com.androidhuman.example.simplegithub.api.GithubApi
 import com.androidhuman.example.simplegithub.api.model.GithubRepo
 import com.androidhuman.example.simplegithub.api.provideGithubApi
-import com.androidhuman.example.simplegithub.ui.search.GlideApp
+import com.androidhuman.example.simplegithub.ui.GlideApp
 import kotlinx.android.synthetic.main.activity_repository.*
 import retrofit2.Call
 import retrofit2.Callback
