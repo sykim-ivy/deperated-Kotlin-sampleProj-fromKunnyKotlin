@@ -20,38 +20,38 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.RepositoryHolder>() {
 
     private var listener: ItemClickListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoryHolder {
-        return RepositoryHolder(parent)
-    }
+    // [miss] 함수에서 생성된 객체반환만을 처리하므로 single expression(단일 표현식)으로 사용가능(p.248) : '= { return 생성객체; }' -> ' = '으로 변경
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoryHolder  = RepositoryHolder(parent)
 
     override fun onBindViewHolder(holder: RepositoryHolder, position: Int) {
-        val repo: GithubRepo = items[position]
 
-        with(holder.itemView) {
-            GlideApp.with(context)
-                .load(repo.owner.avatarUrl)
-                .placeholder(placeholder)
-                .into(ivItemRepositoryProfile)
+        // items[position]값은 다른 곳에서 사용되지 않으므로, let()함수를 이용하여 값이 사용되는 범위를 명시적으로 한정할 수 있음
+        items[position].let {  repo -> //[syk] let함수에서 it으로 사용하지 않고 별칭 줄 경우
+            with(holder.itemView) {
+                GlideApp.with(context)
+                    .load(repo.owner.avatarUrl)
+                    .placeholder(placeholder)
+                    .into(ivItemRepositoryProfile)
 
-            tvItemRepositoryName.text = repo.language
-            try {
-                check(TextUtils.isEmpty(repo.language)) //TODO: << 원래 삼항 연산자였음
-                tvItemRepositoryLanguage.text = context.getText(R.string.no_language_specified)
-            } catch (e: IllegalStateException ) {
-                tvItemRepositoryLanguage.text = repo.language
-            }
+                tvItemRepositoryName.text = repo.language
+                try {
+                    check(TextUtils.isEmpty(repo.language)) //TODO: << 원래 삼항 연산자였음
+                    tvItemRepositoryLanguage.text = context.getText(R.string.no_language_specified)
+                } catch (e: IllegalStateException ) {
+                    tvItemRepositoryLanguage.text = repo.language
+                }
 
-            setOnClickListener {
+                setOnClickListener {
                     if(null != listener) {
                         listener!!.onItemClick(repo) // 위에서 널체크해서 !! 사용
                     }
+                }
             }
         }
     }
 
-    override fun getItemCount(): Int {
-        return items.count()
-    }
+    // [miss] 함수에서 생성된 객체반환만을 처리하므로 single expression(단일 표현식)으로 사용가능(p.248) : '= { return 생성객체; }' -> ' = '으로 변경
+    override fun getItemCount(): Int = items.count()
 
     fun setItemClickListener(listener: ItemClickListener) {
         this.listener = listener

@@ -24,9 +24,15 @@ import java.lang.IllegalStateException
 
 class SignInActivity : AppCompatActivity() {
 
-    //TODO: [의문점1] lateinit 적용시 초기화 안들어갈 경우의 불안을 안고가는 것보다 var로 선언하고 null로 초기화후 코틀린이나 코드상 널체크되는게 낫지 않은지?
-    private var api: AuthApi? = null
-    private var authTokenProvider: AuthTokenProvider? = null
+    /**
+     * val 변수는 Lazy 프로퍼티를 써주어 사용시점 전에 초기화를 수행할 수 있다.
+     * [syk][miss] Lazy 프로퍼티
+     *  - 해당 프로퍼티의 첫 사용 시점에서 초기화를 수행
+     *  - val 변수에서만 사용가능
+     *  - 싱글톤 클래스의 구현을 프로퍼티에 적용한 형태라고 볼 수 있다고 함 (p.252)
+     */
+    private val api by lazy { provideAuthApi() } // static method called // api는 API가 등록된 Retrofit 서비스 객체 }
+    private val authTokenProvider by lazy { AuthTokenProvider(this) } // SP에 auth_token값 저장 관리 객체
 
     private var accessTokenCall: Call<GithubAccessToken>? = null // API응답형식을 GithubAccessToken로 받아오는 객체 Call
 
@@ -51,9 +57,6 @@ class SignInActivity : AppCompatActivity() {
             intent.launchUrl(this@SignInActivity, authUri)
         }
 
-        api = provideAuthApi() // static method called // api는 API가 등록된 Retrofit 서비스 객체
-
-        authTokenProvider = AuthTokenProvider(this) // SP에 auth_token값 저장 관리 객체
         if(null != authTokenProvider!!.getToken()) { // [syk] 위에서 객체 생성하니까 '!!'키워드로 non-null값 보장
             Log.d("SignInActivity", "[ksg] auth_token is exist")
             launchMainActivity()
@@ -80,15 +83,22 @@ class SignInActivity : AppCompatActivity() {
         getAccessToken(code)
     }
 
+    override fun onStop() {
+        super.onStop()
+        // [miss][syk] 액티비티가 사리지는 시점에서 API호출객체가 생성되어 있다면 API 요청 취소
+        accessTokenCall?.run { cancel() }
+    }
+
     private fun getAccessToken(code: String) {
         Log.d("SignInActivity", "[ksg] getAccessToken() : code = $code")
         showProgress()
 
-        accessTokenCall = api?.getAccessToken(
+        accessTokenCall = api.getAccessToken(
             BuildConfig.GITHUB_CLIENT_ID,
             BuildConfig.GITHUB_CLIENT_SECRET, code)
 
-        accessTokenCall?.enqueue(object : Callback<GithubAccessToken> { // << TODO: object로 선언하면 클래스 선언과 동시에 객체가 생성됩니다. << 이거 이렇게 쓰기도 해??
+        // [miss] getAccessToken()의 리턴타입이 non-null이므로 비널값 보증가능하여 '!!' 사용가능
+        accessTokenCall!!.enqueue(object : Callback<GithubAccessToken> { // << TODO: object로 선언하면 클래스 선언과 동시에 객체가 생성됩니다. << 이거 이렇게 쓰기도 해??
 
             override fun onFailure(call: Call<GithubAccessToken>, t: Throwable) {
                 Log.d("SignInActivity", "[ksg] access_token API : onFailure()")
@@ -107,7 +117,7 @@ class SignInActivity : AppCompatActivity() {
                 val token: GithubAccessToken? = response.body()
                 if(response.isSuccessful && null != token) {
                     Log.d("SignInActivity", "[ksg] get auth_token success!")
-                    authTokenProvider?.updateToken(token.accessToken)
+                    authTokenProvider.updateToken(token.accessToken)
                     launchMainActivity()
                 } else {
                     showError(IllegalStateException("Not successful: " + response.message()))
