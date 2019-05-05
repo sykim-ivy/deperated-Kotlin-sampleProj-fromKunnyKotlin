@@ -58,6 +58,7 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.RepositoryHolder>() {
     }
 
     fun setItems(items: List<GithubRepo>) {
+        // api응답으로 받은 List를 어댑터에서 사용할 MutableList로 변환
         this.items = items.toMutableList()
     }
 
