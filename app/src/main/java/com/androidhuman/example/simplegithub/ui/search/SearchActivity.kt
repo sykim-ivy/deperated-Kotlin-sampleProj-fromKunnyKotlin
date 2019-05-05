@@ -14,9 +14,10 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.androidhuman.example.simplegithub.R
 import com.androidhuman.example.simplegithub.api.GithubApi
-import com.androidhuman.example.simplegithub.api.GithubApiProvider
+
 import com.androidhuman.example.simplegithub.api.model.GithubRepo
 import com.androidhuman.example.simplegithub.api.model.RepoSearchResponse
+import com.androidhuman.example.simplegithub.api.provideGithubApi
 import com.androidhuman.example.simplegithub.ui.repo.RepositoryActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_search.*
@@ -44,7 +45,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
         rvActivitySearchList.layoutManager = LinearLayoutManager(this@SearchActivity)
         rvActivitySearchList.adapter = adapter
 
-        api = GithubApiProvider.provideGithubApi(this@SearchActivity)
+        api = provideGithubApi(this@SearchActivity)
         Log.d("SearchActivity", "[ksg] ${api == null}")
     }
 

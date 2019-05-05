@@ -12,8 +12,8 @@ import java.io.IOException
 import java.lang.IllegalStateException
 
 
-object GithubApiProvider { // [miss] 코틀린 싱글톤 객체는 object로 선언!!!
-    // object 내 선언된 값이나 함수는 자바의 static 멤버와 동일한 방법으로 사용
+//object GithubApiProvider { // [miss] 코틀린 싱글톤 객체는 object로 선언!!!
+//    // object 내 선언된 값이나 함수는 자바의 static 멤버와 동일한 방법으로 사용
 
     /**
      * [Github OAuth API] Retrofit 객체 생성
@@ -108,6 +108,6 @@ object GithubApiProvider { // [miss] 코틀린 싱글톤 객체는 object로 선
     }
 
 
-}
+//}
 
 
