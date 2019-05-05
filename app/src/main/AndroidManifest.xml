@@ -37,7 +37,6 @@
             </intent-filter>
         </activity>
 
-        <!-- TODO TODO TODO SearchActivity&RepositoryActivity -->
         <activity android:name="ui.search.SearchActivity"
                   android:label="@string/search"
                   android:parentActivityName="ui.main.MainActivity">

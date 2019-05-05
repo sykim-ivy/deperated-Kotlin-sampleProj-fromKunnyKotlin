@@ -3,7 +3,6 @@ package com.androidhuman.example.simplegithub.ui.search
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
@@ -27,6 +26,7 @@ import retrofit2.Response
 
 class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
 
+    //TODO: [의문점1] lateinit 적용시 초기화 안들어갈 경우의 불안을 안고가는 것보다 var로 선언하고 null로 초기화후 코틀린이나 코드상 널체크되는게 낫지 않은지?
     var adapter: SearchAdapter? = null
 
     var api: GithubApi? = null
@@ -122,9 +122,16 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
             override fun onFailure(call: Call<RepoSearchResponse>, t: Throwable) {
                 Log.d("SearchActivity", "[ksg] onFailure()")
                 hideProgress()
-                t.message?.let {
-                    showError(it)
-                }
+                showError(t.message)
+
+                /** [syk] nullable인 파라미터값으로 null허용하지 않는 함수호출시, null일때 호출하지 않는 경우 'nullableParameter?.let{ method(it) }' 방법 사용
+                 *  파라미터?.let {
+                 *      널허용안하는메소드(it)
+                 *  }
+                 */
+//                t.message?.let {
+//                    showError(it)
+//                }
             }
 
         } )
@@ -138,8 +145,8 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     }
 
     private fun hideSoftKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-        imm?.hideSoftInputFromWindow(searchView?.windowToken, 0)
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager //[miss] as 변환형에 굳이 '?'붙여서 널처리할 필요X
+        imm.hideSoftInputFromWindow(searchView?.windowToken, 0)
     }
 
     private fun collapseSearchView() {
@@ -152,21 +159,29 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     }
 
     private fun showProgress() {
-        pbActivitySearch?.visibility = View.VISIBLE
+        pbActivitySearch.visibility = View.VISIBLE
     }
 
     private fun hideProgress() {
-        pbActivitySearch?.visibility = View.GONE
+        pbActivitySearch.visibility = View.GONE
     }
 
-    private fun showError(message: String) {
-        tvActivitySearchMessage?.text = message
-        tvActivityMainMessage?.visibility = View.VISIBLE
+    private fun showError(message: String?) {
+        /**
+         * [syk] Nullable인 값을 대입시 2가지 방법 존재
+         * 1) null 인 경우 아예 값을 대입하지 않는 경우 --> '?.' 사용
+         * 2) null 인 경우 넣어줄 대체값이 있는 경우 ---> 엘비스 연산자 사용 --> 'null이 아닐때 값' ?: 'null일때값'
+         *
+         * [miss] 아래 경우, 에러메시지 이므로 null일때 대체값을 하나 만들어 넣어주는 게 좋아보임!
+         */
+        tvActivitySearchMessage.text = message ?: "Unexpected Error: error msg is null"
+
+        tvActivityMainMessage.visibility = View.VISIBLE // [miss] 익스텐션으로 접근하는 레이아웃객체에는 널체크'?.'을 붙일 필요X
     }
 
     private fun hideError() {
         tvActivitySearchMessage?.text = ""
-        tvActivityMainMessage?.visibility = View.GONE
+        tvActivityMainMessage.visibility = View.GONE
     }
 
 }

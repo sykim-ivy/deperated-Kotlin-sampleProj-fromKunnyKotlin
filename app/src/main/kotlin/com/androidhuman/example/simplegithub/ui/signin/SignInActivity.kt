@@ -24,6 +24,7 @@ import java.lang.IllegalStateException
 
 class SignInActivity : AppCompatActivity() {
 
+    //TODO: [의문점1] lateinit 적용시 초기화 안들어갈 경우의 불안을 안고가는 것보다 var로 선언하고 null로 초기화후 코틀린이나 코드상 널체크되는게 낫지 않은지?
     private var api: AuthApi? = null
     private var authTokenProvider: AuthTokenProvider? = null
 
@@ -133,7 +134,7 @@ class SignInActivity : AppCompatActivity() {
     fun launchMainActivity() {
         Log.d("SignInActivity", "[ksg] launchMainActivity()")
         startActivity(Intent(
-            this@SignInActivity, MainActivity::class.java) //TODO : .class 어떻게 바꿔야하는지 모르겠음
+            this@SignInActivity, MainActivity::class.java) // [miss]Study : '.class' -> '::class.java' 로 사용
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         )
