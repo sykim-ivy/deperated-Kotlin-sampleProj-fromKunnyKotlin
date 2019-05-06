@@ -18,11 +18,15 @@ import com.androidhuman.example.simplegithub.api.model.GithubRepo
 import com.androidhuman.example.simplegithub.api.model.RepoSearchResponse
 import com.androidhuman.example.simplegithub.api.provideGithubApi
 import com.androidhuman.example.simplegithub.ui.repo.RepositoryActivity
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_search.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.IllegalStateException
 
 class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
 
@@ -36,7 +40,10 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     val adapter by lazy { SearchAdapter() }
 
     val api by lazy { provideGithubApi(this@SearchActivity) }
-    private var searchCall: Call<RepoSearchResponse>? = null
+
+    //[syk][RxJava] API호출 결과를 Observable로 받도록 수정했으므로 , 기존 관리를 위해 사용한 Call객체를 모두 Disposable 객체로 대체
+    private val disposables = CompositeDisposable() //[syk][RxJava] 여러 객체를 관리할 수 있는 CompositeDisposable객체로 생성
+//    private var searchCall: Call<RepoSearchResponse>? = null
 
     private var menuSearch: MenuItem? = null
     private var searchView: SearchView? = null
@@ -106,8 +113,11 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
 
     override fun onStop() {
         super.onStop()
-        // [miss][syk] 액티비티가 사리지는 시점에서 API호출객체가 생성되어 있다면 API 요청 취소
-        searchCall?.run { cancel() }
+
+        //[syk][RxJava] 관리하던 disposable 객체를 모두 해체
+        disposables.clear() // CompositeDisposable.clear() 함수 호출시 CompositeDisposable 내 disposable객체를 모두 해제 (disposable해제시점의 네트워크 요청이 있었으면 자동 취소)
+//        // [miss][syk] 액티비티가 사리지는 시점에서 API호출객체가 생성되어 있다면 API 요청 취소
+//        searchCall?.run { cancel() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -132,53 +142,97 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
 
     private fun searchRepository(query: String) {
         Log.d("SearchActivity", "[ksg] searchRepository()")
-        clearResults()
-        hideError()
-        showProgress()
 
-        searchCall = api.searchRepository(query)
-        Log.d("SearchActivity", "[ksg] ${searchCall == null}")
-
-        // [miss] searchRepository()의 리턴타입이 non-null이므로 비널값 보증가능하여 '!!' 사용가능
-        searchCall!!.enqueue(object: Callback<RepoSearchResponse>{
-            override fun onResponse(call: Call<RepoSearchResponse>, response: Response<RepoSearchResponse>) {
-                Log.d("SearchActivity", "[ksg] searchCall API : onResponse()")
-                hideProgress()
-
-                val searchResult = response.body()
-                if(response.isSuccessful && null != searchResult) {
-
-                    // [miss][syk] 하나의 객체의 여러 함수를 호출하는 경우, 인스턴스를 얻기 위해 임시로 변수를 선언하는 부분은 범위 지정 함수(run,with,apply) 사용가능
-                    // [syk] with() 함수를 사용하여 객체 범위 내에서 작업수행
-                    with(adapter) {
-                        setItems(searchResult.items.toMutableList())
-                        notifyDataSetChanged()
-                    }
-
-                    if(searchResult.totalCount == 0) {
-                        showError(getString(R.string.no_search_result))
-                    }
+        //[syk][RxJava] Observable형태롤 반환되는 accessToken을 처리할 수 있도록 코드 변경 // REST API를 통해 access token 요청
+        disposables.add( api.searchRepository(query)
+            //[syk][RxJava] Observable형태로 바꿔주기 위해 flatMap을 사용 //TODO: flatMap, just 함수 알아보기!
+            .flatMap {
+                if(0 == it.totalCount) {
+                    // 검색 결과가 없을 경우 에러 발생시켜 에러 메시지를 표시하도록 함 (이후 곧바로 에러블록이 실행됨)
+                    Observable.error(IllegalStateException("No search result"))
                 } else {
-                    showError("Not Successful : " + response.message())
+                    // 검색 결과 리스트를 다음 스트림으로 전달합니다.
+                    Observable.just(it.items)
                 }
             }
 
-            override fun onFailure(call: Call<RepoSearchResponse>, t: Throwable) {
-                Log.d("SearchActivity", "[ksg] onFailure()")
-                hideProgress()
-                showError(t.message)
+            // 이 이후 수행되는 모든 코드는 메인 스레드에서 실행 : RxAndroid에서 제공하는 스케줄러인 AndroidSchedulers사용
+            .observeOn(AndroidSchedulers.mainThread())
 
-                /** [syk] nullable인 파라미터값으로 null허용하지 않는 함수호출시, null일때 호출하지 않는 경우 'nullableParameter?.let{ method(it) }' 방법 사용
-                 *  파라미터?.let {
-                 *      널허용안하는메소드(it)
-                 *  }
-                 */
-//                t.message?.let {
-//                    showError(it)
-//                }
+            // 구독할때 수행할 작업 구현
+            .doOnSubscribe {
+                clearResults()
+                hideError()
+                showProgress()
             }
 
-        } )
+            // 스트림 종료될때 수행할 작업 구현
+            .doOnTerminate {
+                hideProgress()
+            }
+
+            // Observable 구독
+            .subscribe({ items ->
+                // [miss][syk] 하나의 객체의 여러 함수를 호출하는 경우, 인스턴스를 얻기 위해 임시로 변수를 선언하는 부분은 범위 지정 함수(run,with,apply) 사용가능
+                // [syk] with() 함수를 사용하여 객체 범위 내에서 작업수행
+                with(adapter) {
+                    setItems(items.toMutableList())
+                    notifyDataSetChanged()
+                }
+            }) {
+                // 작업이 정상적으로 완료되지 않았을때 호출되는 에러블록 : 네트워크 오류, 데이터 처리 오류 등
+                showError(it.message)
+            }
+
+        )
+
+// // RxJava 미적용시 사용했던 Retrofit코드
+//        clearResults()
+//        hideError()
+//        showProgress()
+//        searchCall = api.searchRepository(query)
+//        Log.d("SearchActivity", "[ksg] ${searchCall == null}")
+//
+//        // [miss] searchRepository()의 리턴타입이 non-null이므로 비널값 보증가능하여 '!!' 사용가능
+//        searchCall!!.enqueue(object: Callback<RepoSearchResponse>{
+//            override fun onResponse(call: Call<RepoSearchResponse>, response: Response<RepoSearchResponse>) {
+//                Log.d("SearchActivity", "[ksg] searchCall API : onResponse()")
+//                hideProgress()
+//
+//                val searchResult = response.body()
+//                if(response.isSuccessful && null != searchResult) {
+//
+//                    // [miss][syk] 하나의 객체의 여러 함수를 호출하는 경우, 인스턴스를 얻기 위해 임시로 변수를 선언하는 부분은 범위 지정 함수(run,with,apply) 사용가능
+//                    // [syk] with() 함수를 사용하여 객체 범위 내에서 작업수행
+//                    with(adapter) {
+//                        setItems(searchResult.items.toMutableList())
+//                        notifyDataSetChanged()
+//                    }
+//
+//                    if(searchResult.totalCount == 0) {
+//                        showError(getString(R.string.no_search_result))
+//                    }
+//                } else {
+//                    showError("Not Successful : " + response.message())
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<RepoSearchResponse>, t: Throwable) {
+//                Log.d("SearchActivity", "[ksg] onFailure()")
+//                hideProgress()
+//                showError(t.message)
+//
+//                /** [syk] nullable인 파라미터값으로 null허용하지 않는 함수호출시, null일때 호출하지 않는 경우 'nullableParameter?.let{ method(it) }' 방법 사용
+//                 *  파라미터?.let {
+//                 *      널허용안하는메소드(it)
+//                 *  }
+//                 */
+////                t.message?.let {
+////                    showError(it)
+////                }
+//            }
+//
+//        })
     }
 
 

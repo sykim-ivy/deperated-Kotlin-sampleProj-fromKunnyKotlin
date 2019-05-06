@@ -1,6 +1,7 @@
 package com.androidhuman.example.simplegithub.api
 
 import com.androidhuman.example.simplegithub.api.model.GithubAccessToken
+import io.reactivex.Observable
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -18,7 +19,7 @@ interface AuthApi {
         @Field("client_id") clientId: String,
         @Field("client_secret") clientSecret: String,
         @Field("code") code: String
-    ) : Call<GithubAccessToken>
+    ) : Observable<GithubAccessToken> // [syk][RxJava] Retrofit으로 받은 응답반환 형태를 Observable로 변환
     /**
      * @Field - POST에서만 동작하며 form-urlencoded로 데이터를 전송합니다. 이 메소드에는 @FormUrlEncoded 어노테이션이 추가되어야 합니다.
      */

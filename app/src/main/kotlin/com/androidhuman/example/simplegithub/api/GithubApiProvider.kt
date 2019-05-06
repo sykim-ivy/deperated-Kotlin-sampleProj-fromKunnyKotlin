@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.lang.IllegalStateException
@@ -22,6 +23,8 @@ import java.lang.IllegalStateException
     fun provideAuthApi(): AuthApi  = Retrofit.Builder()
             .baseUrl("https://github.com/")
             .client(provideOkHttpClient(provideLoggingInterceptor(), null))
+            // [syk][RxJava] 받은 응답을 Observable형태로 변환하기 위해 RxJava2CallAdapterFactory를 API의 콜어댑터로 추가, createAsync()로 비동기방식으로 API 호출 및 콜어댑터 생성
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AuthApi::class.java) // << API 통신을 위해 정의한 인터페이스를 Retrofit에 초기화 // [miss]Study : '.class' -> '::class.java' 로 사용
@@ -34,6 +37,8 @@ import java.lang.IllegalStateException
             .baseUrl("https://api.github.com/")
             .client(provideOkHttpClient(provideLoggingInterceptor(),
                 provideAuthInterceptor(provideAuthTokenProvider(context))))
+            // [syk][RxJava] 받은 응답을 Observable형태로 변환하기 위해 RxJava2CallAdapterFactory를 API의 콜어댑터로 추가, createAsync()로 비동기방식으로 API 호출 및 콜어댑터 생성
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(GithubApi::class.java) // << API 통신을 위해 정의한 인터페이스를 Retrofit에 초기화  // [miss]Study : '.class' -> '::class.java' 로 사용
