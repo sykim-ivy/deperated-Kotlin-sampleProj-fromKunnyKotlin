@@ -20,6 +20,7 @@ import com.androidhuman.example.simplegithub.api.provideGithubApi
 import com.androidhuman.example.simplegithub.extensions.plusAssign
 import com.androidhuman.example.simplegithub.ui.repo.RepositoryActivity
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
+import com.jakewharton.rxbinding2.support.v7.widget.queryTextChangeEvents
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -74,24 +75,47 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
         menuInflater.inflate(R.menu.menu_activity_search, menu)
         menuSearch = menu?.findItem(R.id.menu_activity_search_query)
 
-        // [miss][syk] 하나의 객체의 여러 함수를 호출하는 경우, 인스턴스를 얻기 위해 임시로 변수를 선언하는 부분은 범위 지정 함수(run,with,apply) 사용가능
-        // [syk] apply() 함수를 사용하여 객체 생성과 범위 내에서 작업수행
-        searchView = (menuSearch?.actionView as SearchView).apply {
-            setOnQueryTextListener(object : SearchView.OnQueryTextListener{
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    Log.d("SearchActivity", "[ksg] onQueryTextSubmit(" + query + ")")
-                    updateTitle(query)
-                    hideSoftKeyboard()
-                    collapseSearchView()
-                    query?.let { searchRepository(it) } //TODO: 이렇게 써도 돼나?
-                    return true
-                }
+        //[syk][RxBinding] RxBinding을 적용하여 SearchView 이벤트 부분 재구성
+        searchView = (menuSearch?.actionView as SearchView)
+        // searchView에서 발생하는 이벤트를 Observable형태로 받습니다.
+        viewDisposable += searchView!!.queryTextChangeEvents() //[syk][RxBinding-kotlin] RxBinding 코틀린 확장 라이브러리 적용시, RxBinding에서 제공하는 함수를 가가 UI위젯의 인스턴스에서 직접 호출할 수 있어 편리함
+            // 검색을 시켰을때 발생한 이벤트만 받도록 처리
+            .filter {  it.isSubmitted }
+            // 이벤트에서 검색어 텍스트를 추출
+            .map { it.queryText() }
+            // 빈 문자열이 아닌 검색어만 받음
+            .filter{ it.isNotEmpty() }
+            // 검색어를 String형태로 변환
+            .map { it.toString() }
+            // 이 이후 수행되는 모든 코드는 메인 스레드에서 실행 : RxAndroid에서 제공하는 스케줄러인 AndroidSchedulers사용
+            .observeOn(AndroidSchedulers.mainThread())
+            // Observable 구독
+            .subscribe {  query ->
+                updateTitle(query)
+                hideSoftKeyboard()
+                collapseSearchView()
+                searchRepository(query)
+            }
 
-                override fun onQueryTextChange(p0: String?): Boolean {
-                    return false
-                }
-            })
-        }
+//        // RxBinding 적용 이전 코드
+//        // [miss][syk] 하나의 객체의 여러 함수를 호출하는 경우, 인스턴스를 얻기 위해 임시로 변수를 선언하는 부분은 범위 지정 함수(run,with,apply) 사용가능
+//        // [syk] apply() 함수를 사용하여 객체 생성과 범위 내에서 작업수행
+//        searchView = (menuSearch?.actionView as SearchView).apply {
+//            setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+//                override fun onQueryTextSubmit(query: String?): Boolean {
+//                    Log.d("SearchActivity", "[ksg] onQueryTextSubmit(" + query + ")")
+//                    updateTitle(query)
+//                    hideSoftKeyboard()
+//                    collapseSearchView()
+//                    query?.let { searchRepository(it) } //TODO: 이렇게 써도 돼나?
+//                    return true
+//                }
+//
+//                override fun onQueryTextChange(p0: String?): Boolean {
+//                    return false
+//                }
+//            })
+//        }
 
         // [miss][syk] 하나의 객체의 여러 함수를 호출하는 경우, 인스턴스를 얻기 위해 임시로 변수를 선언하는 부분은 범위 지정 함수(run,with,apply) 사용가능
         // [syk] with() 함수를 사용하여 객체 범위 내에서 작업수행
