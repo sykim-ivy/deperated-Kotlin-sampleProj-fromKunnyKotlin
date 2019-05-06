@@ -7,6 +7,7 @@ import android.view.View
 import com.androidhuman.example.simplegithub.R
 import com.androidhuman.example.simplegithub.api.model.GithubRepo
 import com.androidhuman.example.simplegithub.api.provideGithubApi
+import com.androidhuman.example.simplegithub.extensions.plusAssign
 import com.androidhuman.example.simplegithub.ui.GlideApp
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -71,8 +72,7 @@ class RepositoryActivity : AppCompatActivity() {
         Log.d("RepositoryActivity", "[ksg] showRepositoryInfo() login = " + login + ", repoName = " + repoName)
 
         //[syk][RxJava] Observable형태롤 반환되는 accessToken을 처리할 수 있도록 코드 변경 // REST API를 통해 access token 요청
-        disposables.add(
-            api.getRepository(login, repoName)
+        disposables += api.getRepository(login, repoName)
             // 이 이후 수행되는 모든 코드는 메인 스레드에서 실행 : RxAndroid에서 제공하는 스케줄러인 AndroidSchedulers사용
             .observeOn(AndroidSchedulers.mainThread())
             // 구독할때 수행할 작업 구현
@@ -111,7 +111,6 @@ class RepositoryActivity : AppCompatActivity() {
                 }) {
                     showError(it.message)
                 }
-        )
 
 // // RxJava 미적용시 사용했던 Retrofit코드
 //        showProgress()

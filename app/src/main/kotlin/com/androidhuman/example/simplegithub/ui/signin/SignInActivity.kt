@@ -15,6 +15,7 @@ import com.androidhuman.example.simplegithub.api.AuthApi
 import com.androidhuman.example.simplegithub.api.model.GithubAccessToken
 import com.androidhuman.example.simplegithub.api.provideAuthApi
 import com.androidhuman.example.simplegithub.data.AuthTokenProvider
+import com.androidhuman.example.simplegithub.extensions.plusAssign
 import com.androidhuman.example.simplegithub.ui.main.MainActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -100,7 +101,7 @@ class SignInActivity : AppCompatActivity() {
         Log.d("SignInActivity", "[ksg] getAccessToken() : code = $code")
 
         //[syk][RxJava] Observable형태롤 반환되는 accessToken을 처리할 수 있도록 코드 변경 // REST API를 통해 access token 요청
-        disposables.add(
+        disposables +=
             api.getAccessToken(
                 BuildConfig.GITHUB_CLIENT_ID,
                 BuildConfig.GITHUB_CLIENT_SECRET, code)
@@ -128,7 +129,6 @@ class SignInActivity : AppCompatActivity() {
                     //[syk][RxJava] 작업이 정상적으로 완료되지 않았을때 호출되는 에러블록 : 네트워크 오류, 데이터 처리 오류 등
                     showError(it)
                 }
-        )
 
 // // RxJava 미적용시 사용했던 Retrofit코드
 //        showProgress()

@@ -17,6 +17,7 @@ import com.androidhuman.example.simplegithub.api.GithubApi
 import com.androidhuman.example.simplegithub.api.model.GithubRepo
 import com.androidhuman.example.simplegithub.api.model.RepoSearchResponse
 import com.androidhuman.example.simplegithub.api.provideGithubApi
+import com.androidhuman.example.simplegithub.extensions.plusAssign
 import com.androidhuman.example.simplegithub.ui.repo.RepositoryActivity
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -144,7 +145,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
         Log.d("SearchActivity", "[ksg] searchRepository()")
 
         //[syk][RxJava] Observable형태롤 반환되는 accessToken을 처리할 수 있도록 코드 변경 // REST API를 통해 access token 요청
-        disposables.add( api.searchRepository(query)
+        disposables += api.searchRepository(query)
             //[syk][RxJava] Observable형태로 바꿔주기 위해 flatMap을 사용 //TODO: flatMap, just 함수 알아보기!
             .flatMap {
                 if(0 == it.totalCount) {
@@ -184,7 +185,6 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
                 showError(it.message)
             }
 
-        )
 
 // // RxJava 미적용시 사용했던 Retrofit코드
 //        clearResults()
