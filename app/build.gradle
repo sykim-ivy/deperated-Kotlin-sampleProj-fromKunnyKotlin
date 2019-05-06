@@ -55,6 +55,9 @@ dependencies {
     // RxAndroid와 RxJava 라이브러리 의존성 추가
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    // 서포트 라이브러리(appcompat-v7)에서 제공하는 SearchView에 RxBinding을 적용하기 위해
+    // (appcompat-v7)에 상응하는 RxBinding 라이브러리 의존성 추가
+    implementation "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:$rxBindingVersion"
 
     kapt "com.github.bumptech.glide:compiler:$glideVersion" // [miss][] 코틀린 어노테이션 프로세서에서 처리될 수 있도록 의존성에 추가
 

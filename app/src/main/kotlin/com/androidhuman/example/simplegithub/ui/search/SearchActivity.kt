@@ -19,6 +19,7 @@ import com.androidhuman.example.simplegithub.api.model.RepoSearchResponse
 import com.androidhuman.example.simplegithub.api.provideGithubApi
 import com.androidhuman.example.simplegithub.extensions.plusAssign
 import com.androidhuman.example.simplegithub.ui.repo.RepositoryActivity
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -45,6 +46,9 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
     //[syk][RxJava] API호출 결과를 Observable로 받도록 수정했으므로 , 기존 관리를 위해 사용한 Call객체를 모두 Disposable 객체로 대체
     private val disposables = CompositeDisposable() //[syk][RxJava] 여러 객체를 관리할 수 있는 CompositeDisposable객체로 생성
 //    private var searchCall: Call<RepoSearchResponse>? = null
+
+    //[syk][RxBinding] SearchView에 RxBinding을 적용하기 위한 CompositeDisposable객체 생성
+    private val viewDisposable = CompositeDisposable()
 
     private var menuSearch: MenuItem? = null
     private var searchView: SearchView? = null
@@ -119,6 +123,11 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.ItemClickListener {
         disposables.clear() // CompositeDisposable.clear() 함수 호출시 CompositeDisposable 내 disposable객체를 모두 해제 (disposable해제시점의 네트워크 요청이 있었으면 자동 취소)
 //        // [miss][syk] 액티비티가 사리지는 시점에서 API호출객체가 생성되어 있다면 API 요청 취소
 //        searchCall?.run { cancel() }
+
+        //[syk][RxBinding] 액티비티가 완전히 종료되고 있는 경우에만 관리하고 있는 viewDisposable을 해제 +) 화면 꺼지거나 액티비티 화면에서 사라지는 경우에는 해제하지 않음
+        if(isFinishing) {
+            viewDisposable.clear()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
