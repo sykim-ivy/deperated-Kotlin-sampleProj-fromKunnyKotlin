@@ -14,10 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name="ui.main.MainActivity"
+        <activity android:name=".ui.main.MainActivity"
                   android:label="@string/app_name"/>
 
-        <activity android:name="ui.signin.SignInActivity"
+        <activity android:name=".ui.signin.SignInActivity"
                 android:label="@string/app_name"
                 android:launchMode="singleTask">
             <intent-filter>
@@ -37,20 +37,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="ui.search.SearchActivity"
+        <activity android:name=".ui.search.SearchActivity"
                   android:label="@string/search"
-                  android:parentActivityName="ui.main.MainActivity">
+                  android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ui.main.MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
 
-        <activity android:name="ui.repo.RepositoryActivity"
+        <activity android:name=".ui.repo.RepositoryActivity"
                   android:label="@string/view_repository"
-                  android:parentActivityName="ui.main.MainActivity">
+                  android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value="ui.main.MainActivity" />
+                    android:value=".ui.main.MainActivity" />
         </activity>
     </application>
 
